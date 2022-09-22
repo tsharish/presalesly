@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+
+# Distribution / packaging
+static/
+upload/
+
+# Environments
+venv/
+.vscode/
+
+# ML related
+catboost_info/
+sentence_model/
+*.pkl
+!opp_score_model.pkl
+
+# Logs
+*.log

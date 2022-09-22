@@ -1,0 +1,15 @@
+# requirements.in
+fastapi
+uvicorn
+sqlalchemy
+psycopg2
+pydantic[email,dotenv]
+python-jose[cryptography]
+passlib[bcrypt]
+python-multipart
+catboost
+lightgbm
+scikit-learn
+scikit-optimize
+sentence-transformers
+typer
