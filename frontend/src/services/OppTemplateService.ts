@@ -3,7 +3,7 @@ import CrudApiService from "./CrudApiService"
 
 class OppTemplateService extends CrudApiService {
     constructor() {
-        super('opp_template')
+        super('opp_templates')
     }
 
     deleteAll(oppTemplates: OppTemplate[]) {

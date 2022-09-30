@@ -14,7 +14,7 @@ from app.core.permissions import permission_exception
 from app.models.opportunity import OpportunityCreate, OpportunityRead, OpportunityUpdate
 
 
-router = APIRouter(prefix="/opportunity", tags=["opportunity"])
+router = APIRouter(prefix="/opportunities", tags=["opportunities"])
 
 
 @router.get("/", response_model=Page[OpportunityRead], summary="Get all opportunities")

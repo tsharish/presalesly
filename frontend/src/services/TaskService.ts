@@ -2,7 +2,7 @@ import CrudApiService from './CrudApiService'
 
 class TaskService extends CrudApiService {
     constructor() {
-        super('task')
+        super('tasks')
     }
 
     getByOpportunity(id: number) {

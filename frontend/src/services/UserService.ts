@@ -2,7 +2,7 @@ import CrudApiService from "./CrudApiService"
 
 class UserService extends CrudApiService {
     constructor() {
-        super('user')
+        super('users')
     }
 }
 

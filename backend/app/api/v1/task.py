@@ -10,7 +10,7 @@ from app.core.security import get_current_user
 from app.models.task import TaskCreate, TaskRead, TaskUpdate
 
 
-router = APIRouter(prefix="/task", tags=["task"])
+router = APIRouter(prefix="/tasks", tags=["tasks"])
 
 
 @router.get("/", response_model=Page[TaskRead], summary="Get all tasks for the current user")

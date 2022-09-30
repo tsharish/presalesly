@@ -15,7 +15,7 @@ from app.models.industry import (
     IndustryUpdate,
 )
 
-router = APIRouter(prefix="/industry", tags=["industry"])
+router = APIRouter(prefix="/industries", tags=["industries"])
 industry = CRUDBaseDesc[Industry, IndustryDescription, IndustryCreate, IndustryUpdate](
     Industry, IndustryDescription
 )

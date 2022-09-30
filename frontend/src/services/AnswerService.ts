@@ -3,7 +3,7 @@ import type { Question } from '@/types/Answer'
 
 class AnswerService extends CrudApiService {
     constructor() {
-        super('answer')
+        super('answers')
     }
 
     recommend(data: Question) {

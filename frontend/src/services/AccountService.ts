@@ -2,7 +2,7 @@ import CrudApiService from './CrudApiService'
 
 class AccountService extends CrudApiService {
     constructor() {
-        super('account')
+        super('accounts')
     }
 
     upload(data: any) {

@@ -16,9 +16,9 @@ from app.models.opp_template import (
     OppTemplateTaskUpdate,
 )
 
-opp_template_router = APIRouter(prefix="/opp_template", tags=["opportunity template"])
+opp_template_router = APIRouter(prefix="/opp_templates", tags=["opportunity templates"])
 opp_template_task_router = APIRouter(
-    prefix="/opp_template_task", tags=["opportunity template task"]
+    prefix="/opp_template_tasks", tags=["opportunity template tasks"]
 )
 
 

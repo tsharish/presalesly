@@ -15,7 +15,7 @@ from app.models.opp_stage import (
     OppStageUpdate,
 )
 
-router = APIRouter(prefix="/opp_stage", tags=["opportunity stage"])
+router = APIRouter(prefix="/opp_stages", tags=["opportunity stages"])
 opp_stage = CRUDBaseDesc[OppStage, OppStageDescription, OppStageCreate, OppStageUpdate](
     OppStage, OppStageDescription
 )

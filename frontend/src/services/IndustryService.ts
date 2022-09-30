@@ -3,7 +3,7 @@ import CrudApiService from "./CrudApiService"
 
 class IndustryService extends CrudApiService {
     constructor() {
-        super('industry')
+        super('industries')
     }
 
     deleteAll(industries: Industry[]) {

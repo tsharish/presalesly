@@ -13,7 +13,7 @@ from app.core.security import get_current_user
 from app.core.permissions import permission_exception
 from app.models.account import Account, AccountCreate, AccountRead, AccountUpdate
 
-router = APIRouter(prefix="/account", tags=["account"])
+router = APIRouter(prefix="/accounts", tags=["accounts"])
 account = CRUDBase[Account, AccountCreate, AccountUpdate](Account)
 
 

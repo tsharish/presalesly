@@ -2,7 +2,7 @@ import CrudApiService from "./CrudApiService"
 
 class OppTemplateTaskService extends CrudApiService {
     constructor() {
-        super('opp_template_task')
+        super('opp_template_tasks')
     }
 
     getByOppTemplate(id: number) {

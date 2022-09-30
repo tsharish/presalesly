@@ -2,12 +2,12 @@ import CrudApiService from './CrudApiService'
 
 class OpportunityService extends CrudApiService {
     constructor() {
-        super('opportunity')
+        super('opportunities')
     }
 
     getOpen(options: any) {
         return this.api.get(this.getUrl() + 'open', {
-            params: {...options}, 
+            params: { ...options },
         })
     }
 

@@ -3,7 +3,7 @@ import CrudApiService from "./CrudApiService"
 
 class OppStageService extends CrudApiService {
     constructor() {
-        super('opp_stage')
+        super('opp_stages')
     }
 
     deleteAll(oppStages: OppStage[]) {

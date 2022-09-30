@@ -15,7 +15,7 @@ from app.models.answer import (
     Question,
 )
 
-router = APIRouter(prefix="/answer", tags=["answer"])
+router = APIRouter(prefix="/answers", tags=["answers"])
 
 
 @router.get("/", response_model=Page[AnswerRead], summary="Get all answer entries")

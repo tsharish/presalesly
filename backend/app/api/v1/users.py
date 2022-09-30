@@ -16,7 +16,7 @@ from app.core.security import (
     JWT_EXP,
 )
 
-router = APIRouter(prefix="/user", tags=["user"])
+router = APIRouter(prefix="/users", tags=["users"])
 auth_router = APIRouter(prefix="/auth", tags=["auth"])
 
 
