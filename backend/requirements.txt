@@ -6,17 +6,15 @@
 #
 anyio==3.6.1
     # via starlette
-bcrypt==3.2.2
+bcrypt==4.0.0
     # via passlib
-catboost==1.0.6
+catboost==1.1
     # via -r requirements.in
-certifi==2022.6.15
+certifi==2022.9.24
     # via requests
 cffi==1.15.1
-    # via
-    #   bcrypt
-    #   cryptography
-charset-normalizer==2.1.0
+    # via cryptography
+charset-normalizer==2.1.1
     # via requests
 click==8.1.3
     # via
@@ -27,7 +25,9 @@ colorama==0.4.5
     # via
     #   click
     #   tqdm
-cryptography==37.0.4
+contourpy==1.0.5
+    # via matplotlib
+cryptography==38.0.1
     # via python-jose
 cycler==0.11.0
     # via matplotlib
@@ -35,32 +35,32 @@ dnspython==2.2.1
     # via email-validator
 ecdsa==0.18.0
     # via python-jose
-email-validator==1.2.1
+email-validator==1.3.0
     # via pydantic
-fastapi==0.79.0
+fastapi==0.85.0
     # via -r requirements.in
 filelock==3.8.0
     # via
     #   huggingface-hub
     #   transformers
-fonttools==4.36.0
+fonttools==4.37.4
     # via matplotlib
 graphviz==0.20.1
     # via catboost
-greenlet==1.1.2
+greenlet==1.1.3
     # via sqlalchemy
-h11==0.13.0
+h11==0.14.0
     # via uvicorn
-huggingface-hub==0.8.1
+huggingface-hub==0.10.0
     # via
     #   sentence-transformers
     #   transformers
-idna==3.3
+idna==3.4
     # via
     #   anyio
     #   email-validator
     #   requests
-joblib==1.1.0
+joblib==1.2.0
     # via
     #   nltk
     #   scikit-learn
@@ -69,13 +69,14 @@ kiwisolver==1.4.4
     # via matplotlib
 lightgbm==3.3.2
     # via -r requirements.in
-matplotlib==3.5.3
+matplotlib==3.6.0
     # via catboost
 nltk==3.7
     # via sentence-transformers
-numpy==1.23.2
+numpy==1.23.3
     # via
     #   catboost
+    #   contourpy
     #   lightgbm
     #   matplotlib
     #   pandas
@@ -90,7 +91,7 @@ packaging==21.3
     #   huggingface-hub
     #   matplotlib
     #   transformers
-pandas==1.4.3
+pandas==1.5.0
     # via catboost
 passlib[bcrypt]==1.7.4
     # via -r requirements.in
@@ -110,7 +111,7 @@ pyasn1==0.4.8
     #   rsa
 pycparser==2.21
     # via cffi
-pydantic[dotenv,email]==1.9.2
+pydantic[dotenv,email]==1.10.2
     # via
     #   -r requirements.in
     #   fastapi
@@ -122,20 +123,20 @@ python-dateutil==2.8.2
     # via
     #   matplotlib
     #   pandas
-python-dotenv==0.20.0
+python-dotenv==0.21.0
     # via pydantic
 python-jose[cryptography]==3.3.0
     # via -r requirements.in
 python-multipart==0.0.5
     # via -r requirements.in
-pytz==2022.2.1
+pytz==2022.4
     # via pandas
 pyyaml==6.0
     # via
     #   huggingface-hub
     #   pyaml
     #   transformers
-regex==2022.8.17
+regex==2022.9.13
     # via
     #   nltk
     #   transformers
@@ -154,7 +155,7 @@ scikit-learn==1.1.2
     #   sentence-transformers
 scikit-optimize==0.9.0
     # via -r requirements.in
-scipy==1.9.0
+scipy==1.9.1
     # via
     #   catboost
     #   lightgbm
@@ -171,13 +172,13 @@ six==1.16.0
     #   ecdsa
     #   python-dateutil
     #   python-multipart
-sniffio==1.2.0
+sniffio==1.3.0
     # via anyio
-sqlalchemy==1.4.40
+sqlalchemy==1.4.41
     # via -r requirements.in
-starlette==0.19.1
+starlette==0.20.4
     # via fastapi
-tenacity==8.0.1
+tenacity==8.1.0
     # via plotly
 threadpoolctl==3.1.0
     # via scikit-learn
@@ -189,13 +190,13 @@ torch==1.12.1
     #   torchvision
 torchvision==0.13.1
     # via sentence-transformers
-tqdm==4.64.0
+tqdm==4.64.1
     # via
     #   huggingface-hub
     #   nltk
     #   sentence-transformers
     #   transformers
-transformers==4.21.1
+transformers==4.22.2
     # via sentence-transformers
 typer==0.6.1
     # via -r requirements.in
@@ -205,9 +206,9 @@ typing-extensions==4.3.0
     #   pydantic
     #   torch
     #   torchvision
-urllib3==1.26.11
+urllib3==1.26.12
     # via requests
-uvicorn==0.18.2
+uvicorn==0.18.3
     # via -r requirements.in
 wheel==0.37.1
     # via lightgbm
