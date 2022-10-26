@@ -1,5 +1,9 @@
 import type { Description } from '@/types/Common'
 
+const fieldMap = new Map([
+    ['industry.id', 'industry_id']
+])
+
 export function getDescription(descriptions: Description[], languageCode: string) {
     //Takes an array of descriptions and returns the description based on the language code passed
     return descriptions.find(description => description.language_code === languageCode)?.description
@@ -58,12 +62,21 @@ export async function copyToClipboard(text: string) {
 
 function createFilter(key: string, constraint: { matchMode: any; value: any }) {
     let filter: any = {}
+
+    // Replace the key if it exists in the field mapping
+    const _key = fieldMap.get(key)
+    if (_key !== undefined) {
+        key = _key
+    }
+
+    // If key is a compound word, split it into model and field
     if (key.indexOf('.') === -1) {
         filter.field = key
     } else {
         filter.model = key.split('.')[0]
         filter.field = key.split('.')[1]
     }
+
     filter.operator = constraint.matchMode
     filter.value = constraint.value
 
@@ -114,6 +127,12 @@ export function createSortSpec(sorts: { field: string; order: number }[]) {
     const sortSpec: any[] = []
 
     for (const sort of sorts) {
+        // Replace the field if it exists in the field mapping
+        const _key = fieldMap.get(sort.field)
+        if (_key !== undefined) {
+            sort.field = _key
+        }
+
         if (sort.field.indexOf('.') === -1) {
             sortSpec.push({
                 field: sort.field,

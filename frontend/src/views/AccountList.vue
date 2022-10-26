@@ -23,7 +23,8 @@ const filters = ref({
     'name': { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
     'country_code': { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
     'annual_revenue': { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
-    'number_of_employees': { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] }
+    'number_of_employees': { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
+    'industry.id': { value: null, matchMode: FilterMatchMode.IN }
 })
 const account = ref<Account>({
     name: '',
@@ -145,10 +146,12 @@ async function deleteSelectedRecords() {
                         placeholder="Search by # of Employees" />
                 </template>
             </Column>
-            <Column field="industry.description" header="Industry" :sortable="true">
+            <Column field="industry.description" filterField="industry.id" header="Industry" :sortable="true"
+                :showFilterMatchModes="false" :filterMenuStyle="{ 'width': '15rem' }">
                 <template #filter="{ filterModel }">
-                    <InputText type="text" v-model="filterModel.value" class="p-column-filter"
-                        placeholder="Search by Industry" />
+                    <div class="mb-3">Select Industry</div>
+                    <MultiSelect v-model="filterModel.value" :options="industries" optionLabel="description"
+                        optionValue="id" placeholder="Any" class="p-column-filter"></MultiSelect>
                 </template>
             </Column>
             <Column :exportable="false" style="min-width:8rem">

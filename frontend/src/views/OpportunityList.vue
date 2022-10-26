@@ -30,7 +30,7 @@ const filters = ref({
     'stage_id': { value: null, matchMode: FilterMatchMode.IN },
     'close_date': { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.DATE_IS }] },
     'status': { value: null, matchMode: FilterMatchMode.IN },
-    'owner.full_name': { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] }
+    'owner_id': { value: null, matchMode: FilterMatchMode.IN }
 })
 const { users, loadingUsers, loadUsers } = useUserLoader()
 const { accounts, loadingAccounts, loadAccounts } = useAccountLoader()
@@ -156,19 +156,19 @@ async function deleteSelectedRecords() {
         <PrimeDataTable :ApiService="OpportunityService" :initialFilters="filters" title="Manage Opportunities"
             :refresh="refreshTime" @click-new="openNewEditDialog(reset)">
             <Column field="name" header="Opportunity Name" :sortable="true">
-                <template #filter="{filterModel}">
+                <template #filter="{ filterModel }">
                     <InputText type="text" v-model="filterModel.value" class="p-column-filter"
                         placeholder="Search by Opportunity Name" />
                 </template>
             </Column>
             <Column field="account.name" header="Account Name" :sortable="true">
-                <template #filter="{filterModel}">
+                <template #filter="{ filterModel }">
                     <InputText type="text" v-model="filterModel.value" class="p-column-filter"
                         placeholder="Search by Account Name" />
                 </template>
             </Column>
             <Column field="expected_amount" header="Expected Amount" dataType="numeric" :sortable="true">
-                <template #filter="{filterModel}">
+                <template #filter="{ filterModel }">
                     <InputNumber v-model="filterModel.value" class="p-column-filter"
                         placeholder="Search by Expected Amount" />
                 </template>
@@ -177,33 +177,35 @@ async function deleteSelectedRecords() {
                 </template>
             </Column>
             <Column field="stage.description" sortField="stage_id" filterField="stage_id" header="Stage"
-                :sortable="true" :showFilterMatchModes="false" :filterMenuStyle="{'width':'15rem'}">
-                <template #filter="{filterModel}">
+                :sortable="true" :showFilterMatchModes="false" :filterMenuStyle="{ 'width': '15rem' }">
+                <template #filter="{ filterModel }">
                     <div class="mb-3">Select Opportunity Stage</div>
                     <MultiSelect v-model="filterModel.value" :options="oppStages" optionLabel="description"
                         optionValue="id" placeholder="Any" class="p-column-filter"></MultiSelect>
                 </template>
             </Column>
             <Column field="close_date" header="Close Date" dataType="date" :sortable="true" style="min-width:10rem">
-                <template #body="{data}">
+                <template #body="{ data }">
                     {{ data.close_date }}
                 </template>
-                <template #filter="{filterModel}">
+                <template #filter="{ filterModel }">
                     <Calendar v-model="filterModel.value" dateFormat="mm/dd/yy" placeholder="mm/dd/yyyy" />
                 </template>
             </Column>
             <Column field="status" header="Status" :sortable="true" :showFilterMatchModes="false"
-                :filterMenuStyle="{'width':'15rem'}">
-                <template #filter="{filterModel}">
+                :filterMenuStyle="{ 'width': '15rem' }">
+                <template #filter="{ filterModel }">
                     <div class="mb-3">Select Opportunity Status</div>
                     <MultiSelect v-model="filterModel.value" :options="oppStatuses" optionLabel="description"
                         optionValue="id" placeholder="Any" class="p-column-filter"></MultiSelect>
                 </template>
             </Column>
-            <Column field="owner.full_name" header="Owner" :sortable="true">
-                <template #filter="{filterModel}">
-                    <InputText type="text" v-model="filterModel.value" class="p-column-filter"
-                        placeholder="Search by Owner" />
+            <Column field="owner.full_name" filterField="owner_id" header="Owner" :showFilterMatchModes="false"
+                :filterMenuStyle="{ 'width': '15rem' }">
+                <template #filter="{ filterModel }">
+                    <div class="mb-3">Select Owner</div>
+                    <MultiSelect v-model="filterModel.value" :options="users" optionLabel="full_name" optionValue="id"
+                        placeholder="Any" class="p-column-filter"></MultiSelect>
                 </template>
             </Column>
             <Column :exportable="false" style="min-width:8rem; float: center">
@@ -216,7 +218,7 @@ async function deleteSelectedRecords() {
             </Column>
         </PrimeDataTable>
 
-        <Dialog v-model:visible="newEditDialog" :style="{width: '450px'}" header="Opportunity Details" :modal="true"
+        <Dialog v-model:visible="newEditDialog" :style="{ width: '450px' }" header="Opportunity Details" :modal="true"
             class="p-fluid">
             <div class="field">
                 <label for="externalID">External ID</label>
