@@ -84,5 +84,5 @@ async def upload_accounts(
             shutil.copyfileobj(upload_file.file, buffer)
     finally:
         upload_file.file.close()
-    account.bulk_create(user=user, filepath=destination, schema=schema)
+    account.bulk_create(user=user, filepath=destination)
     return {"message": "Accounts have been uploaded successfully"}
