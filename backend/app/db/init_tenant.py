@@ -115,6 +115,8 @@ def init_access_control(db: Session) -> None:
 def init_user(db: Session) -> None:
     """Initializes the Initial user"""
     initial_user = User(
+        first_name="Initial",
+        last_name="User",
         email=settings.INITIAL_EMAIL,
         password=get_hashed_password(settings.INITIAL_PASSWORD),
         role_id=settings.INITIAL_USER_ROLE,
