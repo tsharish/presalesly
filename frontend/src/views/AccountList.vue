@@ -71,6 +71,7 @@ function editRecord(recordToEdit: Account) {
 
 async function saveRecord() {
     //Setting to undefined since empty strings will fail backend validation
+    account.value.annual_revenue_curr_code = account.value.annual_revenue_curr_code === '' ? undefined : account.value.annual_revenue_curr_code
     account.value.source_url = account.value.source_url === '' ? undefined : account.value.source_url
     account.value.email = account.value.email === '' ? undefined : account.value.email
     try {
