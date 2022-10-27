@@ -1,10 +1,12 @@
 import { defineStore } from 'pinia'
 import AuthService from '@/services/AuthService'
+import type { UserDetail } from '@/types/User'
 
 export const useAuthStore = defineStore('auth', {
     state: () => ({
         authenticated: false,
-        loginLanguageCode: '', 
+        loginLanguageCode: '',
+        user: null as UserDetail | null
     }),
     getters: {},
     actions: {
@@ -18,6 +20,7 @@ export const useAuthStore = defineStore('auth', {
                 if (response.data.access_token) {
                     localStorage.setItem('user', JSON.stringify(response.data))
                     this.authenticated = true
+                    this.user = response.data.user
                 }
             } catch (error: any) {
                 this.authenticated = false
@@ -26,6 +29,7 @@ export const useAuthStore = defineStore('auth', {
         logout() {
             localStorage.removeItem('user')
             this.authenticated = false
+            this.user = null
         }
     }
 })

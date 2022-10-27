@@ -79,6 +79,7 @@ async def login_access_token(
     db: Session = Depends(get_db), form_data: OAuth2PasswordRequestForm = Depends()
 ):
     user = authenticate_user(db=db, email=form_data.username, password=form_data.password)
+    user_data = UserRead(**vars(user))
 
     if not user:
         raise HTTPException(
@@ -91,4 +92,4 @@ async def login_access_token(
 
     access_token_expires = timedelta(minutes=JWT_EXP)
     access_token = create_access_token(data={"sub": user.email}, expires_delta=access_token_expires)
-    return {"access_token": access_token, "token_type": "bearer"}
+    return {"access_token": access_token, "token_type": "bearer", "user": user_data}

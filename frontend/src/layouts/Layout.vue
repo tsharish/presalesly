@@ -4,9 +4,11 @@ import AppMenu from './AppMenu.vue'
 import { useToast } from 'primevue/usetoast'
 import { usePrimeVue } from 'primevue/config'
 import { useRoute } from 'vue-router'
-import { ref, watch, computed, onBeforeUpdate } from 'vue'
-import { navigationMenu } from './navigation'
+import { ref, watch, computed, onBeforeUpdate, onMounted } from 'vue'
+import { useAuthStore } from '@/stores/auth'
+import { getMenu } from './navigation'
 
+const navigationMenu = ref([{}])
 const layoutMode = ref('static')
 const staticMenuInactive = ref(false)
 const overlayMenuActive = ref(false)
@@ -17,10 +19,19 @@ const menuActive = ref(false)
 const toast = useToast()
 const primeVue = usePrimeVue()
 const route = useRoute()
+const auth = useAuthStore()
 
-watch(route, () => {
+watch(route, (async) => {
     menuActive.value = false
     toast.removeAllGroups()
+})
+
+onMounted(() => {
+    // Sets the navigation menu based on the user's role. Is onMounted the best place to do this?
+    const roleId = auth.user?.role_id
+    if (roleId !== undefined) {
+        navigationMenu.value = getMenu(roleId)
+    }
 })
 
 function onWrapperClick() {
