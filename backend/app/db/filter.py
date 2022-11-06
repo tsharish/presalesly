@@ -2,7 +2,7 @@ from collections import namedtuple
 from collections.abc import Iterable
 from six import string_types
 from itertools import chain
-from sqlalchemy import and_, not_, or_
+from sqlalchemy import and_, not_, or_, func
 from sqlalchemy.sql.expression import Select
 
 from app.core.exceptions import BadFilterFormat
@@ -32,10 +32,10 @@ class Operator:
         "gte": lambda f, v: f >= v,
         "<=": lambda f, v: f <= v,
         "lte": lambda f, v: f <= v,
-        "startsWith": lambda f, v: f.startswith(v),
-        "endsWith": lambda f, v: f.endswith(v),
-        "contains": lambda f, v: f.contains(v),
-        "notContains": lambda f, v: ~f.contains(v),
+        "startsWith": lambda f, v: func.lower(f).startswith(v.lower()),
+        "endsWith": lambda f, v: func.lower(f).endswith(v.lower()),
+        "contains": lambda f, v: func.lower(f).contains(v.lower()),
+        "notContains": lambda f, v: ~func.lower(f).contains(v.lower()),
         "in": lambda f, v: f.in_(v),
         "not_in": lambda f, v: ~f.in_(v),
         "dateIs": lambda f, v: f == v,
