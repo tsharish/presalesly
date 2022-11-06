@@ -30,10 +30,10 @@ const filters = ref({
     'stage_id': { value: null, matchMode: FilterMatchMode.IN },
     'close_date': { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.DATE_IS }] },
     'status': { value: null, matchMode: FilterMatchMode.IN },
-    'owner_id': { value: null, matchMode: FilterMatchMode.IN }
+    'owner_id': { value: null, matchMode: FilterMatchMode.EQUALS }
 })
 const { users, loadingUsers, loadUsers } = useUserLoader()
-const { accounts, loadingAccounts, loadAccounts } = useAccountLoader()
+const { accounts, loadAccounts } = useAccountLoader()
 const opportunity = ref<Opportunity>({
     name: '',
     expected_amount: 0,
@@ -43,7 +43,9 @@ const opportunity = ref<Opportunity>({
     probability: 0,
     owner_id: 0,
     account_id: 0,
-    stage_id: 0
+    stage_id: 0,
+    owner: undefined,
+    account: undefined
 })
 const startDate = ref(new Date())
 const closeDate = ref(new Date())
@@ -52,8 +54,6 @@ const oppTemplates = ref<OppTemplate[]>([])
 
 onMounted(async () => {
     refresh()
-    loadAccounts()
-    loadUsers()
 
     //Stages and Templates are only loaded initially since they are not expected to change frequently
     try {
@@ -95,7 +95,9 @@ function reset() {
         owner_id: 0,
         account_id: 0,
         stage_id: 0,
-        opp_template_id: undefined
+        opp_template_id: undefined,
+        owner: undefined,
+        account: undefined
     }
     startDate.value = new Date()
     closeDate.value = new Date()
@@ -111,9 +113,10 @@ function editRecord(recordToEdit: OpportunityDetails) {
 async function saveRecord() {
     opportunity.value.start_date = startDate.value.getFullYear() + '-' + (startDate.value.getMonth() + 1) + '-' + startDate.value.getDate()
     opportunity.value.close_date = closeDate.value.getFullYear() + '-' + (closeDate.value.getMonth() + 1) + '-' + closeDate.value.getDate()
-    if (opportunity.value.probability_percent !== undefined) {
-        opportunity.value.probability = opportunity.value.probability_percent / 100
-    }
+    if (opportunity.value.account) { opportunity.value.account_id = opportunity.value.account.id }
+    if (opportunity.value.owner) { opportunity.value.owner_id = opportunity.value.owner.id }
+    if (opportunity.value.probability_percent) { opportunity.value.probability = opportunity.value.probability_percent / 100 }
+
     try {
         if (opportunity.value.id) {    // Record must be edited
             await OpportunityService.update(opportunity.value.id, opportunity.value)
@@ -204,8 +207,9 @@ async function deleteSelectedRecords() {
                 :filterMenuStyle="{ 'width': '15rem' }">
                 <template #filter="{ filterModel }">
                     <div class="mb-3">Select Owner</div>
-                    <MultiSelect v-model="filterModel.value" :options="users" optionLabel="full_name" optionValue="id"
-                        placeholder="Any" class="p-column-filter"></MultiSelect>
+                    <Dropdown v-model="filterModel.value" :options="users" optionLabel="full_name" optionValue="id"
+                        placeholder="Any" :filter="true" @filter="loadUsers" @show="loadUsers" :loading="loadingUsers">
+                    </Dropdown>
                 </template>
             </Column>
             <Column :exportable="false" style="min-width:8rem; float: center">
@@ -257,15 +261,13 @@ async function deleteSelectedRecords() {
             </div>
             <div class="field">
                 <label for="account">Account</label>
-                <Dropdown id="account" v-model="opportunity.account_id" :options="accounts" optionLabel="name"
-                    optionValue="id" :loading="loadingAccounts" showClear placeholder="Select an Account"
-                    @show="loadAccounts" />
+                <AutoComplete v-model="opportunity.account" :suggestions="accounts" @complete="loadAccounts($event)"
+                    :dropdown="true" optionLabel="name" forceSelection></AutoComplete>
             </div>
             <div class="field">
                 <label for="owner">Owner</label>
-                <Dropdown id="owner" v-model="opportunity.owner_id" :options="users" optionLabel="full_name"
-                    optionValue="id" :loading="loadingUsers" showClear placeholder="Select an Owner"
-                    @show="loadUsers" />
+                <AutoComplete v-model="opportunity.owner" :suggestions="users" @complete="loadUsers($event)"
+                    :dropdown="true" optionLabel="full_name" forceSelection></AutoComplete>
             </div>
             <div class="field">
                 <label for="stage">Stage</label>

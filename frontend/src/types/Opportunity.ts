@@ -16,7 +16,9 @@ export interface Opportunity {
     owner_id: number,
     account_id: number,
     stage_id: number,
-    opp_template_id?: number
+    opp_template_id?: number,
+    owner: UserSummary | undefined,
+    account: AccountSummary | undefined
 }
 
 // To use for reading opportunity details

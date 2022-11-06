@@ -27,6 +27,7 @@ import TabMenu from 'primevue/tabmenu'
 import Checkbox from 'primevue/checkbox'
 import Textarea from 'primevue/textarea'
 import Panel from 'primevue/panel'
+import AutoComplete from 'primevue/autocomplete'
 
 import 'primevue/resources/themes/tailwind-light/theme.css'
 import 'primevue/resources/primevue.min.css'
@@ -64,5 +65,6 @@ app.component('TabMenu', TabMenu)
 app.component('Checkbox', Checkbox)
 app.component('Textarea', Textarea)
 app.component('Panel', Panel)
+app.component('AutoComplete', AutoComplete)
 
 app.mount('#app')

@@ -16,9 +16,10 @@ const answer = ref<Answer>({
     question: '',
     answer: '',
     owner_id: 0,
-    is_active: true
+    is_active: true,
+    owner: undefined
 })
-const { users, loadingUsers, loadUsers } = useUserLoader()
+const { users, loadUsers } = useUserLoader()
 
 if (route.params.id === undefined) {
     message.value = 'Add Answer Entry'
@@ -38,10 +39,11 @@ onMounted(async () => {
             }
         }
     }
-    loadUsers()
 })
 
 async function saveAnswer() {
+    if (answer.value.owner) { answer.value.owner_id = answer.value.owner.id }
+
     if (route.params.id === undefined) {
         // Answer entry needs to be added
         try {
@@ -50,6 +52,7 @@ async function saveAnswer() {
         } catch (error: any) {
             toast.add({ severity: 'error', summary: 'Error', detail: 'Error creating Answer Entry', life: 3000 })
         }
+        router.push({ name: 'answers' })
     } else {
         // Answer entry needs to be updated 
         try {
@@ -77,8 +80,8 @@ async function saveAnswer() {
         </div>
         <div class="field">
             <label for="owner">Owner</label>
-            <Dropdown id="owner" v-model="answer.owner_id" :options="users" optionLabel="full_name" optionValue="id"
-                :loading="loadingUsers" showClear placeholder="Select an Owner" @show="loadUsers" />
+            <AutoComplete v-model="answer.owner" :suggestions="users" @complete="loadUsers($event)" :dropdown="true"
+                optionLabel="full_name" forceSelection></AutoComplete>
         </div>
         <div class="flex justify-content-end mt-5">
             <Button label="Cancel" icon="pi pi-times" class="p-button-text w-7rem mr-3"

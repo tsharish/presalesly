@@ -22,7 +22,8 @@ const task = ref<Task>({
     priority: 'Medium',
     status: 'Not Started',
     parent_type_id: 'opportunity',
-    parent_id: 0
+    parent_id: 0,
+    owner: undefined
 })
 
 onMounted(() => {
@@ -52,7 +53,8 @@ function reset() {
         completed_on: new Date(),
         status: 'Not Started',
         parent_type_id: 'opportunity',
-        parent_id: 0
+        parent_id: 0,
+        owner: undefined
     }
 }
 

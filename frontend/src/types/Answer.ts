@@ -1,10 +1,13 @@
+import type { UserSummary } from "./User"
+
 export interface Answer {
     id?: number,
     language_code: string,
     question: string,
     answer: string,
     owner_id: number,
-    is_active: boolean
+    is_active: boolean,
+    owner: UserSummary | undefined
 }
 
 export interface Question {

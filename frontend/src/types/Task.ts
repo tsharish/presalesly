@@ -1,3 +1,5 @@
+import type { UserSummary } from "./User"
+
 export interface Task {
     id?: number,
     description: string,
@@ -7,5 +9,6 @@ export interface Task {
     completed_on?: Date,
     status: string,
     parent_type_id: string,
-    parent_id: number
+    parent_id: number,
+    owner: UserSummary | undefined
 }
