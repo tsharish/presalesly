@@ -1,8 +1,9 @@
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
+from sqlalchemy.orm import relationship
 
 from app.db.base import Base
 from app.models.base import AppBase
-from app.models.user import UserTimeStampMixin, UserTimeStampBase
+from app.models.user import UserTimeStampMixin, UserTimeStampBase, UserSummary
 from app.models.task import HasTasks
 
 # SQLAlchemy models
@@ -13,6 +14,8 @@ class Answer(Base, HasTasks, UserTimeStampMixin):
     answer = Column(String, nullable=False)
     owner_id = Column(Integer, ForeignKey("user.id"))
     is_active = Column(Boolean, default=True)
+
+    owner = relationship("User", foreign_keys=[owner_id])
 
 
 # Pydantic models
@@ -30,6 +33,7 @@ class AnswerCreate(AnswerBase):
 
 class AnswerRead(UserTimeStampBase, AnswerBase):
     id: int
+    owner: UserSummary
 
 
 class AnswerUpdate(AnswerBase):

@@ -14,7 +14,7 @@ from datetime import date, datetime
 
 from app.db.base import Base
 from app.models.base import AppBase
-from app.models.user import UserTimeStampMixin, UserTimeStampBase
+from app.models.user import UserTimeStampMixin, UserTimeStampBase, UserSummary
 from app.core.enums import Priority, TaskStatus, TaskParentType
 
 # SQLAlchemy models
@@ -29,6 +29,8 @@ class Task(Base, UserTimeStampMixin):
     status = Column(String, default=TaskStatus.not_started)
     parent_type_id = Column(String, nullable=False)
     parent_id = Column(Integer, nullable=False)
+
+    owner = relationship("User", foreign_keys=[owner_id], backref="tasks")
 
     @property
     def parent(self):
@@ -89,6 +91,7 @@ class TaskRead(UserTimeStampBase, TaskBase):
     status: TaskStatus
     parent_type_id: str
     parent_id: int
+    owner: UserSummary
 
 
 class TaskUpdate(TaskBase):
