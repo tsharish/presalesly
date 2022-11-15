@@ -30,7 +30,8 @@ const task = ref<Task>({
     priority: 'Medium',
     status: 'Not Started',
     parent_type_id: '',
-    parent_id: 0
+    parent_id: 0,
+    owner: undefined
 })
 
 onMounted(() => {
@@ -47,7 +48,8 @@ function reset() {
         completed_on: new Date(),
         status: 'Not Started',
         parent_type_id: '',
-        parent_id: 0
+        parent_id: 0,
+        owner: undefined
     }
 }
 
@@ -87,13 +89,13 @@ async function deleteSelectedRecords() {
         <PrimeDataTable :ApiService="TaskService" :initialFilters="filters" title="Manage Tasks" :refresh="refreshTime"
             :showToolbar="false">
             <Column field="description" header="Description" :sortable="true">
-                <template #filter="{filterModel}">
+                <template #filter="{ filterModel }">
                     <InputText type="text" v-model="filterModel.value" class="p-column-filter"
                         placeholder="Search by Task Description" />
                 </template>
             </Column>
             <Column field="parent_type_id" header="Parent Type" :sortable="true">
-                <template #filter="{filterModel}">
+                <template #filter="{ filterModel }">
                     <InputText type="text" v-model="filterModel.value" class="p-column-filter"
                         placeholder="Search by Parent Type" />
                 </template>
@@ -102,27 +104,27 @@ async function deleteSelectedRecords() {
                 </template>
             </Column>
             <Column field="parent_id" header="Parent ID" dataType="numeric" :sortable="true">
-                <template #filter="{filterModel}">
+                <template #filter="{ filterModel }">
                     <InputNumber v-model="filterModel.value" class="p-column-filter"
                         placeholder="Search by parent ID" />
                 </template>
             </Column>
             <Column field="due_date" header="Due Date" dataType="date" :sortable="true" style="min-width:10rem">
-                <template #filter="{filterModel}">
+                <template #filter="{ filterModel }">
                     <Calendar v-model="filterModel.value" dateFormat="mm/dd/yy" placeholder="mm/dd/yyyy" />
                 </template>
             </Column>
             <Column field="priority" header="Priority" :sortable="true" :showFilterMatchModes="false"
-                :filterMenuStyle="{'width':'15rem'}">
-                <template #filter="{filterModel}">
+                :filterMenuStyle="{ 'width': '15rem' }">
+                <template #filter="{ filterModel }">
                     <div class="mb-3">Select Task Priority</div>
                     <MultiSelect v-model="filterModel.value" :options="priorities" optionLabel="description"
                         optionValue="id" placeholder="Any" class="p-column-filter"></MultiSelect>
                 </template>
             </Column>
             <Column field="status" header="Status" :sortable="true" :showFilterMatchModes="false"
-                :filterMenuStyle="{'width':'15rem'}">
-                <template #filter="{filterModel}">
+                :filterMenuStyle="{ 'width': '15rem' }">
+                <template #filter="{ filterModel }">
                     <div class="mb-3">Select Task Status</div>
                     <MultiSelect v-model="filterModel.value" :options="taskStatuses" optionLabel="description"
                         optionValue="id" placeholder="Any" class="p-column-filter"></MultiSelect>
