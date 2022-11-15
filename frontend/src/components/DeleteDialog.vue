@@ -1,6 +1,13 @@
 <script setup lang="ts">
+import { ref, watch } from 'vue'
+
 const props = defineProps<{ deleteDialog: boolean }>()
 const emit = defineEmits(['click-no', 'click-yes'])
+const deleteDialog = ref(props.deleteDialog)
+
+watch(() => props.deleteDialog, (newVal) => {
+    deleteDialog.value = newVal
+})
 </script>
 
 <template>

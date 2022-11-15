@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ref, watch } from 'vue'
 import type { OppTemplateTask } from '@/types/OppTemplateTask'
 import { priorities } from '@/constants'
 import { useToast } from 'primevue/usetoast'
@@ -10,14 +11,24 @@ const props = defineProps<{
     oppTemplateTask: OppTemplateTask
 }>()
 const emit = defineEmits(['click-cancel', 'click-save'])
+const taskNewEditDialog = ref(props.taskNewEditDialog)
+const oppTemplateTask = ref(props.oppTemplateTask)
+
+watch(() => props.taskNewEditDialog, (newVal) => {
+    taskNewEditDialog.value = newVal
+})
+
+watch(() => props.oppTemplateTask, (newVal) => {
+    oppTemplateTask.value = newVal
+})
 
 async function saveRecord(event: any) {
     try {
-        if (props.oppTemplateTask.id) {     // Task must be updated
-            await OppTemplateTaskService.update(props.oppTemplateTask.id, props.oppTemplateTask)
-            toast.add({ severity: 'success', summary: 'Successful', detail: `Task ${props.oppTemplateTask.id} updated`, life: 3000 })
+        if (oppTemplateTask.value.id) {     // Task must be updated
+            await OppTemplateTaskService.update(oppTemplateTask.value.id, oppTemplateTask.value)
+            toast.add({ severity: 'success', summary: 'Successful', detail: `Task ${oppTemplateTask.value.id} updated`, life: 3000 })
         } else {                            // Task must be created
-            await OppTemplateTaskService.create(props.oppTemplateTask)
+            await OppTemplateTaskService.create(oppTemplateTask.value)
             toast.add({ severity: 'success', summary: 'Successful', detail: 'Task created', life: 3000 })
         }
     } catch (error: any) {
@@ -28,7 +39,7 @@ async function saveRecord(event: any) {
 </script>
 
 <template>
-    <Dialog v-model:visible="taskNewEditDialog" :style="{width: '450px'}" header="Template Task Details" :modal="true"
+    <Dialog v-model:visible="taskNewEditDialog" :style="{ width: '450px' }" header="Template Task Details" :modal="true"
         class="p-fluid" @update:visible="$emit('click-cancel', $event)">
         <div class="field">
             <label for="description">Description</label>

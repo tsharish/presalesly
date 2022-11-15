@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import type { Task } from '@/types/Task'
 import { formatDate } from '@/composables/useUtils'
 
@@ -12,6 +12,10 @@ const emit = defineEmits<{
     (e: 'checkbox-clicked', task: Task): void
 }>()
 const checked = ref(props.task.status === 'Completed')
+
+watch(() => props.task.status, (newVal) => {
+    checked.value = newVal === 'Completed'
+})
 
 function checkboxClicked() {
     checked.value = !checked.value

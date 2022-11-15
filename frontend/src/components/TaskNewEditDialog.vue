@@ -14,11 +14,20 @@ const props = defineProps<{
     task: Task
 }>()
 const emit = defineEmits(['click-cancel', 'click-save'])
+const taskNewEditDialog = ref(props.taskNewEditDialog)
 const task = ref(props.task)
 const dueDate = ref(new Date())
 
-watch(() => task.value.due_date, (newValue) => {
-    dueDate.value = calculateDateWithOffset(newValue)
+watch(() => props.taskNewEditDialog, (newVal) => {
+    taskNewEditDialog.value = newVal
+})
+
+watch(() => props.task, (newVal) => {
+    task.value = newVal
+})
+
+watch(() => task.value.due_date, (newVal) => {
+    dueDate.value = calculateDateWithOffset(newVal)
 })
 
 async function saveRecord(event: any) {
