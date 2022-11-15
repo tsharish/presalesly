@@ -45,7 +45,9 @@ class CRUDTask(CRUDBase[Task, TaskCreate, TaskUpdate]):
 
         return (
             db.execute(
-                select(Task).where(Task.parent_id == opp_id, Task.parent_type_id == "opportunity")
+                select(Task)
+                .where(Task.parent_id == opp_id, Task.parent_type_id == "opportunity")
+                .order_by(Task.due_date)
             )
             .scalars()
             .all()
