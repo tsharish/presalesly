@@ -95,7 +95,7 @@ async function deleteTask(task: Task) {
 }
 
 async function changeTaskStatus(task: Task) {
-    if (task.status != 'Completed') {
+    if (task.status !== 'Completed') {
         task.status = 'Completed'
     } else {
         task.status = 'In Progress'
