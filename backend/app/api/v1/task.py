@@ -71,3 +71,8 @@ async def delete_task(
         raise HTTPException(status_code=404, detail="The task with this ID does not exist.")
     task.delete(db=db, db_obj=task_to_delete, user=user)
     return {"message": f"Task {id} has been deleted successfully"}
+
+
+@router.get("/dashboard/data", summary="Get task dashboard data")
+async def get_task_dashboard(db: Session = Depends(get_db), user: User = Depends(get_current_user)):
+    return task.get_dashboard_data(db=db, user=user)

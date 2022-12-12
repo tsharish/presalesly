@@ -13,6 +13,7 @@ venv/
 catboost_info/
 sentence_model/
 *.pkl
+*.ipynb
 !opp_score_model.pkl
 
 # Logs

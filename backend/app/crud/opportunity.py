@@ -1,4 +1,6 @@
-from datetime import timedelta
+import math
+import pandas as pd
+from datetime import timedelta, datetime
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -111,6 +113,116 @@ class CRUDOpp(CRUDBase[Opportunity, OpportunityCreate, OpportunityUpdate]):
         db.commit()
         db.refresh(opportunity)
         return opportunity
+
+    def get_user_dashboard(self, db: Session, user: User):
+        """Returns opportunity dashboard data for the user"""
+        opp_df = pd.read_sql_query(
+            select(
+                Opportunity.id,
+                Opportunity.status,
+                Opportunity.age,
+                Opportunity.close_month.label("close_month"),
+                Opportunity.close_quarter.label("close_quarter"),
+                Opportunity.close_year.label("close_year"),
+            ).where(Opportunity.owner_id == user.id),
+            db.connection(),
+        )
+
+        (
+            open_opportunities,
+            won_opp_current_month,
+            won_opp_current_quarter,
+            average_time_to_close,
+        ) = self._calc_dashboard_kpi(opp_df=opp_df)
+
+        return {
+            "open_opportunities": open_opportunities,
+            "won_opp_current_month": won_opp_current_month,
+            "won_opp_current_quarter": won_opp_current_quarter,
+            "average_time_to_close": average_time_to_close,
+        }
+
+    def get_admin_dashboard(self, db: Session, user: User):
+        """Returns dashboard data for all opportunities"""
+        if user.role_id not in self.ALLOWED_ROLES_ALL:
+            raise permission_exception
+
+        opp_df = pd.read_sql_query(
+            select(
+                Opportunity.id,
+                Opportunity.status,
+                Opportunity.stage_id,
+                Opportunity.expected_amount,
+                Opportunity.age,
+                Opportunity.close_month.label("close_month"),
+                Opportunity.close_quarter.label("close_quarter"),
+                Opportunity.close_year.label("close_year"),
+            ),
+            db.connection(),
+        )
+
+        (
+            open_opportunities,
+            won_opp_current_month,
+            won_opp_current_quarter,
+            average_time_to_close,
+        ) = self._calc_dashboard_kpi(opp_df=opp_df)
+
+        stages, expected_amount = self._calc_pipeline(opp_df=opp_df, db=db)
+
+        return {
+            "open_opportunities": open_opportunities,
+            "won_opp_current_month": won_opp_current_month,
+            "won_opp_current_quarter": won_opp_current_quarter,
+            "average_time_to_close": average_time_to_close,
+            "pipeline": {"stages": stages, "expected_amount": expected_amount},
+        }
+
+    def _calc_dashboard_kpi(self, opp_df: pd.DataFrame):
+        current_month = datetime.now().month
+        current_quarter = (current_month - 1) // 3 + 1
+        current_year = datetime.now().year
+
+        open_opp_df = opp_df[opp_df["status"] == OppStatus.open].copy()
+        won_opp_df = opp_df[opp_df["status"] == OppStatus.won].copy()
+
+        won_opp_current_month = len(
+            won_opp_df[
+                (won_opp_df["close_month"] == current_month)
+                & (won_opp_df["close_year"] == current_year)
+            ]
+        )
+        won_opp_current_quarter = len(
+            won_opp_df[
+                (won_opp_df["close_quarter"] == current_quarter)
+                & (won_opp_df["close_year"] == current_year)
+            ]
+        )
+        open_opportunities = len(open_opp_df)
+        average_time_to_close = won_opp_df["age"].mean()
+
+        if math.isnan(average_time_to_close):
+            average_time_to_close = 0
+
+        return (
+            open_opportunities,
+            won_opp_current_month,
+            won_opp_current_quarter,
+            average_time_to_close,
+        )
+
+    def _calc_pipeline(self, opp_df: pd.DataFrame, db: Session):
+        open_opp_df = opp_df[opp_df["status"] == OppStatus.open].copy()
+        open_opp_df_sum = open_opp_df.groupby("stage_id")["expected_amount"].sum()
+        opp_stage_df = pd.read_sql_query(
+            select(OppStage.id, OppStage.sort_order, OppStage.description.label("stage")),
+            db.connection(),
+        )
+        pipeline_df = pd.merge(
+            open_opp_df_sum, opp_stage_df, how="left", left_on="stage_id", right_on="id"
+        )
+
+        return pipeline_df["stage"].tolist(), pipeline_df["expected_amount"].tolist()
 
 
 opportunity = CRUDOpp(Opportunity)

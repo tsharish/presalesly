@@ -95,6 +95,9 @@ const profMenu = [
         label: 'Opportunities',
         items: [{
             label: 'Pipeline', icon: PrimeIcons.MONEY_BILL, to: '/pipeline',
+        },
+        {
+            label: 'List', icon: PrimeIcons.LIST, to: '/opportunities',
         }]
     },
     {
@@ -122,6 +125,9 @@ const standardMenu = [
         label: 'Opportunities',
         items: [{
             label: 'Pipeline', icon: PrimeIcons.MONEY_BILL, to: '/pipeline',
+        },
+        {
+            label: 'List', icon: PrimeIcons.LIST, to: '/opportunities',
         }]
     }
 ]

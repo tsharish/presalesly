@@ -8,6 +8,10 @@ class TaskService extends CrudApiService {
     getByOpportunity(id: number) {
         return this.api.get(this.getUrl() + 'opportunity/' + id.toString())
     }
+
+    getDashboard() {
+        return this.api.get(this.getUrl() + 'dashboard/data')
+    }
 }
 
 export default new TaskService()

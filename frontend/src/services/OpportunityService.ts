@@ -14,6 +14,14 @@ class OpportunityService extends CrudApiService {
     upload(data: any) {
         return this.api.post(this.getUrl() + 'upload', data)
     }
+
+    getUserDashboard() {
+        return this.api.get(this.getUrl() + 'dashboard/user')
+    }
+
+    getAdminDashboard() {
+        return this.api.get(this.getUrl() + 'dashboard/admin')
+    }
 }
 
 export default new OpportunityService()

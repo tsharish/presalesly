@@ -117,3 +117,17 @@ async def update_opp_score(
     if not opportunity_to_update:
         raise HTTPException(status_code=404, detail="The opportunity with this ID does not exist.")
     return opportunity.update_opp_score(db=db, opportunity=opportunity_to_update)
+
+
+@router.get("/dashboard/user", summary="Get user opportunity dashboard data")
+async def get_opp_dashboard_user(
+    db: Session = Depends(get_db), user: User = Depends(get_current_user)
+):
+    return opportunity.get_user_dashboard(db=db, user=user)
+
+
+@router.get("/dashboard/admin", summary="Get admin opportunity dashboard data")
+async def get_opp_dashboard_admin(
+    db: Session = Depends(get_db), user: User = Depends(get_current_user)
+):
+    return opportunity.get_admin_dashboard(db=db, user=user)
