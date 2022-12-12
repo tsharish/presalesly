@@ -37,6 +37,11 @@ Opportunity Templates allow opportunities to be executed consistently across the
 
 ![Opportunity Template Details](/assets/opp-template-details.png)
 
+### Dashboards
+Role-based dashboards provide users and admins visibility into their performance and responsibilities.
+
+![Dashboard](/assets/dashboard.png)
+
 ## Tech Stack
 Presalesly is developed using ***Python*** and ***FastAPI*** as the backend and ***Vue*** (written in ***TypeScript***) as the frontend.
 
