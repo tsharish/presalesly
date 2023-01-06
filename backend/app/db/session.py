@@ -8,7 +8,7 @@ from app.core.config import settings
 from app.models.shared import Tenant
 
 tenants_cache = dict[str, Tenant]()
-engine = create_engine(settings.SQLALCHEMY_DATABASE_URI)
+engine = create_engine(settings.SQLALCHEMY_DATABASE_URI)  # type: ignore
 db_session: ContextVar[Session] = ContextVar("db_session")
 db_schema: ContextVar[str] = ContextVar("db_schema")
 
@@ -51,10 +51,10 @@ def get_tenant(req: Request) -> Tenant:
 
 def get_db(tenant: Tenant = Depends(get_tenant)):
     """Dependency to get the DB session"""
-    with with_db(tenant.schema) as db:
+    with with_db(tenant.schema) as db:  # type: ignore
         yield db
 
 
-def get_schema_from_request(tenant: Tenant = Depends(get_tenant)) -> str:
+def get_schema_from_request(tenant: Tenant = Depends(get_tenant)):
     """Returns the DB schema based on the host in the request"""
     return tenant.schema

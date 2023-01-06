@@ -4,10 +4,11 @@ from sqlalchemy import select
 from app.db.base import Base
 from app.db.session import with_db
 
-"""Import all the SQLAlchemy models"""
-from app.models.shared import Tenant, Language, Country, Currency
-from app.models.auth import Role, ResourceType, AccessControl
-from app.models.user import User
+"""Import all the SQLAlchemy models
+(Imported here instead of in __init__.py in models to avoid circular import issues)"""
+from app.models.shared import *
+from app.models.auth import *
+from app.models.user import *
 from app.models.opp_stage import *
 from app.models.industry import *
 from app.models.account import *

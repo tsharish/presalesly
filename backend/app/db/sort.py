@@ -43,7 +43,7 @@ class Sort:
         elif order == SORT_DESCENDING:
             sort_fnc = field.desc
 
-        return sort_fnc()
+        return sort_fnc()  # type: ignore
 
 
 def get_named_models(sorts):

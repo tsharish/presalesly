@@ -38,7 +38,7 @@ def get_current_user(
 
     try:
         payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ALG])
-        email: str = payload.get("sub")
+        email = payload.get("sub")
         if email is None:
             raise credentials_exception
     except JWTError:
@@ -57,7 +57,7 @@ def authenticate_user(db: Session, email: str, password: str) -> User | bool:
     auth_user = user.get_by_email(db=db, email=email)
     if auth_user is None:
         return False
-    if not verify_password(password, auth_user.password):
+    if not verify_password(password, auth_user.password):  # type: ignore
         return False
     return auth_user
 
@@ -66,7 +66,7 @@ def create_access_token(
     data: dict, expires_delta: timedelta | None = timedelta(minutes=JWT_EXP)
 ) -> str:
     to_encode = data.copy()
-    expire = datetime.utcnow() + expires_delta
+    expire = datetime.utcnow() + expires_delta  # type: ignore
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, JWT_SECRET_KEY, algorithm=JWT_ALG)
     return encoded_jwt

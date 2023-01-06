@@ -17,7 +17,7 @@ class UserTimeStampMixin:
     """Provides created and last modified user and date time stamp info for objects"""
 
     created_on = Column(DateTime, server_default=func.now())
-    created_on._creation_order = 9997
+    created_on._creation_order = 9997  # type: ignore
     # Columns with foreign keys to other columns must be declared as @declared_attr callables on declarative mixin classes.
     # Refer to 'Composing Mapped Hierarchies with Mixins' in SQLAlchemy documentation.
     @declared_attr
@@ -29,7 +29,7 @@ class UserTimeStampMixin:
         return relationship("User", primaryjoin=lambda: User.id == cls.created_by_id)
 
     updated_on = Column(DateTime, server_onupdate=func.now())
-    updated_on._creation_order = 9998
+    updated_on._creation_order = 9998  # type: ignore
 
     @declared_attr
     def updated_by_id(cls):

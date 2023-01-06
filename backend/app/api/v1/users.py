@@ -87,9 +87,13 @@ async def login_access_token(
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    elif not user.is_active:
-        raise HTTPException(status_code=403, detail="User is not active")
 
-    access_token_expires = timedelta(minutes=JWT_EXP)
-    access_token = create_access_token(data={"sub": user.email}, expires_delta=access_token_expires)
-    return {"access_token": access_token, "token_type": "bearer", "user": user_data}
+    if isinstance(user, User):
+        if not user.is_active:
+            raise HTTPException(status_code=403, detail="User is not active")
+
+        access_token_expires = timedelta(minutes=JWT_EXP)
+        access_token = create_access_token(
+            data={"sub": user.email}, expires_delta=access_token_expires
+        )
+        return {"access_token": access_token, "token_type": "bearer", "user": user_data}

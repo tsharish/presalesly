@@ -24,7 +24,7 @@ def init_database():
             print("Database already exists.")
             return"""
 
-        if not engine.dialect.has_schema(engine, "shared"):
+        if not engine.dialect.has_schema(engine, "shared"):  # type: ignore
             db.execute(schema.CreateSchema("shared"))
 
             get_shared_metadata().create_all(bind=db.connection())

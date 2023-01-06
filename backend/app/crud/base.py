@@ -59,12 +59,12 @@ class CRUDBase(Generic[Model, CreateSchema, UpdateSchema]):
             query = select(self.model)
 
         if filter_spec:
-            query = apply_filters(query=query, default_model=self.model, filter_spec=filter_spec)
+            query = apply_filters(query=query, default_model=self.model, filter_spec=filter_spec)  # type: ignore
 
         if sort_spec:
-            query = apply_sort(query=query, default_model=self.model, sort_spec=sort_spec)
+            query = apply_sort(query=query, default_model=self.model, sort_spec=sort_spec)  # type: ignore
 
-        query, pagination = apply_pagination(db=db, query=query, offset=offset, limit=limit)
+        query, pagination = apply_pagination(db=db, query=query, offset=offset, limit=limit)  # type: ignore
 
         if pagination.total == 0:
             raise HTTPException(status_code=404, detail="No records were found.")
@@ -126,6 +126,7 @@ class CRUDBase(Generic[Model, CreateSchema, UpdateSchema]):
         with filepath.open("r") as f:
             conn = engine.raw_connection()
             cursor = conn.cursor()
+            cmd = None
 
             if self.model.__name__ == "Account":
                 cmd = f"""COPY {schema}.account (external_id, source_url, name, annual_revenue, 
@@ -140,7 +141,7 @@ class CRUDBase(Generic[Model, CreateSchema, UpdateSchema]):
                 owner_id, probability, stage_id, status, created_by_id) 
                 FROM STDIN WITH (FORMAT CSV, HEADER TRUE)"""
 
-            cursor.copy_expert(cmd, f)
+            cursor.copy_expert(cmd, f)  # type: ignore
             conn.commit()
 
 

@@ -35,9 +35,13 @@ def create():
 def list():
     """Show all the tenants"""
     tenants = get_tenants()
-    typer.echo("ID | Name | Schema | Host")
-    for tenant in tenants:
-        typer.echo(f"{tenant.id} | {tenant.name} | {tenant.schema} | {tenant.host}")
+    if tenants is not None:
+        if len(tenants) != 0:
+            typer.echo("ID | Name | Schema | Host")
+            for tenant in tenants:
+                typer.echo(f"{tenant.id} | {tenant.name} | {tenant.schema} | {tenant.host}")
+        else:
+            typer.echo("No tenants found")
 
 
 @tenant_app.command()

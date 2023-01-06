@@ -110,7 +110,7 @@ def _is_iterable_filter(filter_spec):
     return isinstance(filter_spec, Iterable) and not isinstance(filter_spec, (string_types, dict))
 
 
-def build_filters(filter_spec) -> list[Filter]:
+def build_filters(filter_spec):
     """Recursively process `filter_spec`"""
     if _is_iterable_filter(filter_spec):
         return list(chain.from_iterable(build_filters(item) for item in filter_spec))

@@ -2,7 +2,6 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.crud.base import CRUDBase
-from app.db.filter import apply_filters
 from app.models.user import User, UserCreate, UserUpdate
 
 

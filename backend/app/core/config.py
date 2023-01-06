@@ -27,7 +27,7 @@ class Settings(BaseSettings):
             scheme="postgresql",
             user=values.get("POSTGRES_USER"),
             password=values.get("POSTGRES_PASSWORD"),
-            host=values.get("POSTGRES_SERVER"),
+            host=str(values.get("POSTGRES_SERVER")),
             path=f"/{values.get('POSTGRES_DB') or ''}",
         )
 
@@ -44,4 +44,4 @@ class Settings(BaseSettings):
         env_file = ".env"
 
 
-settings = Settings()
+settings = Settings()  # type: ignore

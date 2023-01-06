@@ -11,7 +11,7 @@ from app.db.session import engine, db_schema
 from app.core.enums import MLAlgorithm, OppStatus, Scoring
 from app.models.account import Account
 from app.models.opportunity import Opportunity
-from app.models.ml import SearchResult, TrainResult, ParamDist, Params
+from app.models.ml import ParamDist, Params
 
 
 class OppScore:
@@ -114,12 +114,13 @@ class OppScore:
         scoring: Scoring,
         n_iterations: int,
         set_best_as_default: bool,
-    ) -> SearchResult:
+    ):
         """Performs a Bayesian search to select the best hyperparameters combination
         for the opportunity score ML model"""
         schema = db_schema.get()
         opp_data_X, opp_data_y = self._get_closed_records()
         search_space = self._generate_search_space(param_dist.dict(), algorithm)
+        model = None  # To prevent unbound errors in Pylance
 
         if algorithm == MLAlgorithm.catboost:
             # one_hot_max_size has been set to 100 which significantly speeds up the evaluation process
@@ -149,7 +150,7 @@ class OppScore:
         result = {"best_score": search.best_score_, "best_params": search.best_params_}
         return result
 
-    def train(self, algorithm: MLAlgorithm, params: Params, set_as_default: bool) -> TrainResult:
+    def train(self, algorithm: MLAlgorithm, params: Params, set_as_default: bool):
         """Performs cross validation based on the hyperparameters provided"""
         schema = db_schema.get()
         opp_data_X, opp_data_y = self._get_closed_records()
@@ -159,6 +160,7 @@ class OppScore:
             Scoring.precision.value,
             Scoring.recall.value,
         ]
+        model = None  # To prevent unbound errors in Pylance
 
         if algorithm == MLAlgorithm.catboost:
             model = CatBoostClassifier(
@@ -196,7 +198,7 @@ class OppScore:
             model = joblib.load(self.MODEL_FILENAME)  # Use the generic model
         finally:
             opp_record = self._get_record(opportunity_id)
-            prob = model.predict_proba(opp_record)
+            prob = model.predict_proba(opp_record)  # type: ignore
             return int(prob[0][1] * 100)
 
 
