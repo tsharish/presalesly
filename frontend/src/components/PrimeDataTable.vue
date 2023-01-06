@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref, toRef, watch, type Ref } from 'vue'
-import type { DataTablePageEvent } from 'primevue/datatable'
+import type { DataTablePageEvent, DataTableSortMeta } from 'primevue/datatable'
 import CrudApiService from '@/services/CrudApiService'
 import { createFilterSpec, createSortSpec } from '@/composables/useUtils'
 import { useAuthStore } from '@/stores/auth'
@@ -19,13 +19,17 @@ const props = defineProps({
         type: Object,
         required: true
     },
+    initialSort: {
+        type: Array,
+        default: []
+    },
     dataKey: {
         type: String,
         default: "id"
     },
     title: {
         type: String,
-        required: true
+        default: "Manage Records"
     },
     refresh: {
         type: String,
@@ -35,11 +39,19 @@ const props = defineProps({
         type: Boolean,
         default: true
     },
+    showHeader: {
+        type: Boolean,
+        default: true
+    },
     showNewButton: {
         type: Boolean,
         default: true
     },
     showExportButton: {
+        type: Boolean,
+        default: false
+    },
+    showRefreshOnToolbar: {
         type: Boolean,
         default: false
     }
@@ -54,10 +66,13 @@ const dt = ref()
 const loading = ref(false)
 const totalRecords = ref(0)
 const filters = ref(props.initialFilters)
+// @ts-ignore
+const sort: Ref<DataTableSortMeta[]> = ref(props.initialSort)
 const lazyParams: Ref<any> = ref({
     page: 1,
     size: 10,
-    sort: null,
+    // @ts-ignore
+    sort: createSortSpec(sort.value),
     filter: createFilterSpec(filters.value),
     lang_code: auth.loginLanguageCode
 })
@@ -106,11 +121,13 @@ function onFilter() {
 <template>
     <Toolbar class="mb-2 py-2" v-if="showToolbar">
         <template #start>
-            <Button label="New" icon="pi pi-plus" class="p-button-success mr-2" v-if="showNewButton"
+            <Button v-if="showNewButton" label="New" icon="pi pi-plus" class="p-button-sm mr-2"
                 @click="$emit('click-new', $event)" />
         </template>
         <template #end>
-            <Button label="Export" icon="pi pi-external-link" v-if="showExportButton" @click="exportCSV" />
+            <Button v-if="showExportButton" label="Export" icon="pi pi-external-link" class="mr-2" @click="exportCSV" />
+            <Button v-if="showRefreshOnToolbar" icon="pi pi-refresh" class="p-button-rounded p-button-sm"
+                @click="loadLazyData" />
         </template>
     </Toolbar>
 
@@ -120,12 +137,12 @@ function onFilter() {
         paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
         :rowsPerPageOptions="[10, 20, 50]" :alwaysShowPaginator="false" responsiveLayout="scroll"
         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} records" sortMode="multiple"
-        removableSort>
-        <template #header>
+        v-model:multiSortMeta="sort" removableSort>
+        <template #header v-if="showHeader">
             <div class="table-header flex flex-column md:flex-row md:justify-content-between">
                 <h5 class="mb-2 md:m-0 md:align-self-center">{{ title }}</h5>
-                <span class="p-input-icon-left">
-                    <Button @click="loadLazyData" class="p-button-text p-button-rounded" icon="pi pi-refresh" />
+                <span class="p-input-icon-left" v-if="!showRefreshOnToolbar">
+                    <Button icon="pi pi-refresh" class="p-button-text p-button-rounded" @click="loadLazyData" />
                 </span>
             </div>
         </template>
@@ -148,7 +165,7 @@ function onFilter() {
 }
 
 @media screen and (max-width: 960px) {
-    ::v-deep(.p-toolbar) {
+    :deep(.p-toolbar) {
         flex-wrap: wrap;
 
         .p-button {
