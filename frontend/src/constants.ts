@@ -8,7 +8,6 @@ export const languages = [
 
 export const roles = [
     { id: 'ADMIN', description: 'Admin User' },
-    { id: 'SUPER', description: 'Super User' },
     { id: 'PROF', description: 'Professional User' },
     { id: 'STANDARD', description: 'Standard User' },
 ]

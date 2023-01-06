@@ -1,3 +1,4 @@
+from typing import Final
 from sentence_transformers import SentenceTransformer, util
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -11,7 +12,7 @@ from app.models.answer import Answer, AnswerCreate, AnswerUpdate, Question
 
 
 class CRUDAnswer(CRUDBase[Answer, AnswerCreate, AnswerUpdate]):
-    ALLOWED_ROLES = ("ADMIN", "SUPER", "PROF")
+    ALLOWED_ROLES: Final = ["ADMIN", "PROF"]
 
     @lru_cache
     def _load_embedder(self):
@@ -59,7 +60,7 @@ class CRUDAnswer(CRUDBase[Answer, AnswerCreate, AnswerUpdate]):
 
         # Calculate the top hits
         k = min(3, len(corpus))
-        hits = util.semantic_search(query_embedding, corpus_embeddings, top_k=k)
+        hits = util.semantic_search(query_embedding, corpus_embeddings, top_k=k)  # type: ignore
         hits = hits[0]
 
         # Return the hits from the DB results
