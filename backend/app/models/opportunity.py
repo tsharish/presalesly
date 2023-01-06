@@ -1,3 +1,4 @@
+# type: ignore
 from sqlalchemy import Column, Integer, String, Numeric, Date, ForeignKey, select, func
 from sqlalchemy.orm import column_property, relationship
 from sqlalchemy.sql.expression import extract
@@ -11,12 +12,10 @@ from app.db.base import Base
 from app.models.base import AppBase
 from app.models.user import UserSummary, UserTimeStampMixin, UserTimeStampBase
 from app.core.enums import OppStatus, TaskStatus
-from app.models.account import AccountSummary
-from app.models.opp_stage import OppStageSummary
-from app.models.task import Task, HasTasks
+from app.models.task import Task
 
 # SQLAlchemy models
-class Opportunity(Base, HasTasks, UserTimeStampMixin):
+class Opportunity(Base, UserTimeStampMixin):
     id = Column(Integer, primary_key=True)
     external_id = Column(String)
     name = Column(String, nullable=False)
@@ -38,46 +37,60 @@ class Opportunity(Base, HasTasks, UserTimeStampMixin):
     close_month = column_property(extract("MONTH", close_date))  # Month of the close date
     close_quarter = column_property(extract("QUARTER", close_date))  # Quarter of the close date
     close_year = column_property(extract("YEAR", close_date))  # Year of the close date
-    not_started_task_count = column_property(
-        select(func.count(Task.id))
-        .where(
-            Task.parent_id == id,
-            Task.parent_type_id == "opportunity",
-            Task.status == TaskStatus.not_started,
-        )
-        .correlate_except(Task)
-        .scalar_subquery()
-    )
-    in_progress_task_count = column_property(
-        select(func.count(Task.id))
-        .where(
-            Task.parent_id == id,
-            Task.parent_type_id == "opportunity",
-            Task.status == TaskStatus.in_progress,
-        )
-        .correlate_except(Task)
-        .scalar_subquery()
-    )
-    completed_task_count = column_property(
-        select(func.count(Task.id))
-        .where(
-            Task.parent_id == id,
-            Task.parent_type_id == "opportunity",
-            Task.status == TaskStatus.completed,
-        )
-        .correlate_except(Task)
-        .scalar_subquery()
-    )
 
     # Refer to https://docs.sqlalchemy.org/en/14/orm/mapped_sql_expr.html#using-a-hybrid
+    @hybrid_property
+    def not_started_task_count(self):
+        return len([task for task in self.tasks if task.status == TaskStatus.not_started])
+
+    @not_started_task_count.expression
+    def not_started_task_count(cls):
+        return (
+            select(func.count(Task.id))
+            .where(
+                Task.opportunity_id == id,
+                Task.status == TaskStatus.not_started,
+            )
+            .label("not_started_task_count")
+        )
+
+    @hybrid_property
+    def in_progress_task_count(self):
+        return len([task for task in self.tasks if task.status == TaskStatus.in_progress])
+
+    @in_progress_task_count.expression
+    def in_progress_task_count(cls):
+        return (
+            select(func.count(Task.id))
+            .where(
+                Task.opportunity_id == id,
+                Task.status == TaskStatus.in_progress,
+            )
+            .label("in_progress_task_count")
+        )
+
+    @hybrid_property
+    def completed_task_count(self):
+        return len([task for task in self.tasks if task.status == TaskStatus.completed])
+
+    @completed_task_count.expression
+    def completed_task_count(cls):
+        return (
+            select(func.count(Task.id))
+            .where(
+                Task.opportunity_id == id,
+                Task.status == TaskStatus.completed,
+            )
+            .label("completed_task_count")
+        )
+
     @hybrid_property
     def age(self):
         if self.status == OppStatus.open:
             delta: timedelta = date.today() - self.start_date
-            return delta.days
         else:
             delta: timedelta = self.close_date - self.start_date
-            return delta.days
+        return delta.days
 
     @age.expression
     def age(cls):
@@ -120,12 +133,29 @@ class Opportunity(Base, HasTasks, UserTimeStampMixin):
             else_=0,
         )
 
-    account = relationship("Account", backref="opportunities")
+    @hybrid_property
+    def members(self):
+        if self.tasks:
+            members = [task.owner_id for task in self.tasks]
+            return members
+
+    account = relationship("Account")
     stage = relationship("OppStage")
-    owner = relationship("User", foreign_keys=[owner_id], backref="opportunities")
+    owner = relationship("User", foreign_keys=[owner_id])
+    tasks = relationship("Task", back_populates="opportunity")
 
 
 # Pydantic models
+class AccountRead(AppBase):
+    id: int
+    name: str
+
+
+class OppStageRead(AppBase):
+    id: int
+    description: str | None = None
+
+
 class OpportunityBase(AppBase):
     external_id: str | None = None
     name: str
@@ -159,8 +189,8 @@ class OpportunityCreate(OpportunityBase):
 
 class OpportunityRead(UserTimeStampBase, OpportunityBase):
     id: int
-    account: AccountSummary
-    stage: OppStageSummary
+    account: AccountRead
+    stage: OppStageRead
     owner: UserSummary
     opp_template_id: int | None = None
     status: OppStatus

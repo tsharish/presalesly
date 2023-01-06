@@ -6,31 +6,27 @@ import { useToast } from 'primevue/usetoast'
 import PrimeDataTable from '@/components/PrimeDataTable.vue'
 import TaskService from '@/services/TaskService'
 import useDataTable from '@/composables/useDataTable'
-import { capitalize } from '@/composables/useUtils'
 import type { Task } from '@/types/Task'
 import TaskNewEditDialog from '@/components/TaskNewEditDialog.vue'
 import DeleteDialog from '@/components/DeleteDialog.vue'
 import { priorities, taskStatuses } from '@/constants'
 
 const toast = useToast()
-const { deleteDialog, refreshTime, refresh, hideDeleteDialog } = useDataTable()
+const { newEditDialog, deleteDialog, refreshTime, refresh, hideDeleteDialog } = useDataTable()
 const filters = ref({
     'description': { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-    'parent_type_id': { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-    'parent_id': { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
+    'opportunity.name': { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
     'due_date': { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.DATE_IS }] },
     'priority': { value: null, matchMode: FilterMatchMode.IN },
     'status': { value: null, matchMode: FilterMatchMode.IN }
 })
-const taskNewEditDialog = ref(false)
 const task = ref<Task>({
     description: '',
     due_date: '',
     owner_id: 0,
     priority: 'Medium',
     status: 'Not Started',
-    parent_type_id: '',
-    parent_id: 0,
+    opportunity_id: 0,
     owner: undefined
 })
 
@@ -47,19 +43,18 @@ function reset() {
         priority: 'Medium',
         completed_on: new Date(),
         status: 'Not Started',
-        parent_type_id: '',
-        parent_id: 0,
+        opportunity_id: 0,
         owner: undefined
     }
 }
 
 function editRecord(recordToEdit: Task) {
     task.value = { ...recordToEdit }
-    taskNewEditDialog.value = true
+    newEditDialog.value = true
 }
 
 function afterTaskSave() {
-    taskNewEditDialog.value = false
+    newEditDialog.value = false
     reset()
     refresh()
 }
@@ -94,19 +89,15 @@ async function deleteSelectedRecords() {
                         placeholder="Search by Task Description" />
                 </template>
             </Column>
-            <Column field="parent_type_id" header="Parent Type" :sortable="true">
+            <Column field="opportunity.name" header="Opportunity" :sortable="true">
                 <template #filter="{ filterModel }">
                     <InputText type="text" v-model="filterModel.value" class="p-column-filter"
-                        placeholder="Search by Parent Type" />
+                        placeholder="Search by Opportunity Name" />
                 </template>
                 <template #body="slotProps">
-                    {{ capitalize(slotProps.data.parent_type_id) }}
-                </template>
-            </Column>
-            <Column field="parent_id" header="Parent ID" dataType="numeric" :sortable="true">
-                <template #filter="{ filterModel }">
-                    <InputNumber v-model="filterModel.value" class="p-column-filter"
-                        placeholder="Search by parent ID" />
+                    <router-link :to="{ name: 'opportunity', params: { id: slotProps.data.opportunity.id } }">{{
+                        slotProps.data.opportunity.name
+                    }}</router-link>
                 </template>
             </Column>
             <Column field="due_date" header="Due Date" dataType="date" :sortable="true" style="min-width:10rem">
@@ -140,7 +131,7 @@ async function deleteSelectedRecords() {
             </Column>
         </PrimeDataTable>
 
-        <TaskNewEditDialog :taskNewEditDialog="taskNewEditDialog" :task="task" @click-cancel="taskNewEditDialog = false"
+        <TaskNewEditDialog :taskNewEditDialog="newEditDialog" :task="task" @click-cancel="newEditDialog = false"
             @click-save="afterTaskSave"></TaskNewEditDialog>
 
         <DeleteDialog :deleteDialog="deleteDialog" @click-no="hideDeleteDialog(reset)"

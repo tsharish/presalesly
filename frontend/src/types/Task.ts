@@ -1,4 +1,5 @@
 import type { UserSummary } from "./User"
+import type { OpportunitySummary } from "./Opportunity"
 
 export interface Task {
     id?: number,
@@ -8,7 +9,7 @@ export interface Task {
     priority: string,
     completed_on?: Date,
     status: string,
-    parent_type_id: string,
-    parent_id: number,
-    owner: UserSummary | undefined
+    opportunity_id: number,
+    owner: UserSummary | undefined,
+    opportunity?: OpportunitySummary
 }

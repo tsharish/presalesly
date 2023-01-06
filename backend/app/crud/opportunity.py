@@ -1,5 +1,6 @@
 import math
 import pandas as pd
+from typing import Final
 from datetime import timedelta, datetime
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -17,7 +18,7 @@ from app.ml.opp_score import opp_score
 
 
 class CRUDOpp(CRUDBase[Opportunity, OpportunityCreate, OpportunityUpdate]):
-    ALLOWED_ROLES_ALL = ["ADMIN", "SUPER"]
+    ALLOWED_ROLES_ALL: Final = ["ADMIN"]
 
     def get_all(
         self,
@@ -66,7 +67,7 @@ class CRUDOpp(CRUDBase[Opportunity, OpportunityCreate, OpportunityUpdate]):
 
         # Add tasks to opportunity based on the opportunity template
         if obj_in.opp_template_id is not None:
-            opp_template_tasks = (
+            opp_template_tasks: list[OppTemplateTask] = (
                 db.execute(
                     select(OppTemplateTask).where(
                         OppTemplateTask.opp_template_id == obj_in.opp_template_id
@@ -80,13 +81,12 @@ class CRUDOpp(CRUDBase[Opportunity, OpportunityCreate, OpportunityUpdate]):
                 for row in opp_template_tasks:
                     db_task = Task(
                         description=row.description,
-                        due_date=obj_in.start_date + timedelta(days=row.due_date_offset),
+                        due_date=obj_in.start_date + timedelta(days=row.due_date_offset),  # type: ignore
                         owner_id=obj_in.owner_id,
                         priority=row.priority,
                         is_required=row.is_required,
                         status=TaskStatus.not_started,
-                        parent_type_id="opportunity",
-                        parent_id=db_opp.id,
+                        opportunity_id=db_opp.id,
                         created_by_id=user.id,
                     )
                     db_opp.tasks.append(db_task)
@@ -100,7 +100,7 @@ class CRUDOpp(CRUDBase[Opportunity, OpportunityCreate, OpportunityUpdate]):
     ) -> Opportunity:
         """Updates an opportunity"""
         if obj_in.stage_id is not None:
-            db_obj.status = get_status_from_opp_stage(db=db, stage_id=obj_in.stage_id)
+            db_obj.status = get_status_from_opp_stage(db=db, stage_id=obj_in.stage_id)  # type: ignore
 
         super().update(db, db_obj, obj_in, user)
         return self.update_opp_score(db=db, opportunity=db_obj)
@@ -108,7 +108,7 @@ class CRUDOpp(CRUDBase[Opportunity, OpportunityCreate, OpportunityUpdate]):
     def update_opp_score(self, db: Session, opportunity: Opportunity):
         """Calculates & updates the opportunity AI Score in the database"""
         # This must be called after the underlying Create or Update has been committed
-        opportunity.ai_score = opp_score.predict(opportunity_id=opportunity.id)
+        opportunity.ai_score = opp_score.predict(opportunity_id=opportunity.id)  # type: ignore
         db.add(opportunity)
         db.commit()
         db.refresh(opportunity)

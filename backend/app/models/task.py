@@ -6,16 +6,14 @@ from sqlalchemy import (
     Date,
     DateTime,
     ForeignKey,
-    Table,
 )
-from sqlalchemy.orm import relationship, backref, foreign, remote
-from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.orm import relationship
 from datetime import date, datetime
 
 from app.db.base import Base
 from app.models.base import AppBase
 from app.models.user import UserTimeStampMixin, UserTimeStampBase, UserSummary
-from app.core.enums import Priority, TaskStatus, TaskParentType
+from app.core.enums import Priority, TaskStatus
 
 # SQLAlchemy models
 class Task(Base, UserTimeStampMixin):
@@ -27,50 +25,23 @@ class Task(Base, UserTimeStampMixin):
     priority = Column(String, default=Priority.medium)
     is_required = Column(Boolean, default=False)
     status = Column(String, default=TaskStatus.not_started)
-    parent_type_id = Column(String, nullable=False)
-    parent_id = Column(Integer, nullable=False)
+    opportunity_id = Column(Integer, ForeignKey("opportunity.id"))
 
-    owner = relationship("User", foreign_keys=[owner_id], backref="tasks")
+    owner = relationship("User", foreign_keys=[owner_id])
+    opportunity = relationship("Opportunity", back_populates="tasks")
 
     @property
     def parent(self):
-        """Provides in-Python access to the "parent"
-        by choosing the appropriate relationship."""
-        return getattr(self, "parent_%s" % self.parent_type_id)
-
-
-# https://docs.sqlalchemy.org/en/14/orm/examples.html#module-examples.generic_associations
-class HasTasks(object):
-    """HasTasks mixin, creates a new task_association table for each parent."""
-
-    @declared_attr
-    def tasks(cls):
-        parent_type_id = cls.__tablename__
-        task_association = Table(
-            "%s_tasks" % cls.__tablename__,
-            cls.metadata,
-            Column("task_id", ForeignKey("task.id", ondelete="CASCADE"), primary_key=True),
-            Column(
-                "%s_id" % cls.__tablename__,
-                ForeignKey("%s.id" % cls.__tablename__),
-                primary_key=True,
-            ),
-            schema="tenant",
-        )
-        return relationship(
-            Task,
-            secondary=task_association,
-            backref=backref(
-                "parent_%s" % parent_type_id,
-                primaryjoin=remote(cls.id) == foreign(Task.parent_id),
-                uselist=False,
-                viewonly=True,  # This is to prevent UnmappedColumnError
-            ),
-            cascade="all, delete",  # This will cause all the tasks to be deleted when the parent is deleted
-        )
+        """Returns the opportunity of the task"""
+        return self.opportunity
 
 
 # Pydantic models
+class OpportunityRead(AppBase):
+    id: int
+    name: str
+
+
 class TaskBase(AppBase):
     description: str
     due_date: date
@@ -80,8 +51,7 @@ class TaskBase(AppBase):
 
 class TaskCreate(TaskBase):
     status: TaskStatus = TaskStatus.not_started
-    parent_type_id: TaskParentType
-    parent_id: int
+    opportunity_id: int
 
 
 class TaskRead(UserTimeStampBase, TaskBase):
@@ -89,9 +59,8 @@ class TaskRead(UserTimeStampBase, TaskBase):
     completed_on: datetime | None = None
     is_required: bool
     status: TaskStatus
-    parent_type_id: str
-    parent_id: int
     owner: UserSummary
+    opportunity: OpportunityRead
 
 
 class TaskUpdate(TaskBase):

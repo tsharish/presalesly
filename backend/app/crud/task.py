@@ -5,7 +5,6 @@ from fastapi.exceptions import HTTPException
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.db.base import get_class_by_tablename
 from app.db.session import db_session
 from app.crud.base import CRUDBase
 from app.models.user import User
@@ -26,10 +25,19 @@ class CRUDTask(CRUDBase[Task, TaskCreate, TaskUpdate]):
         user: User,
     ):
         """Returns all the tasks for the current user"""
-        query = select(self.model).where(Task.owner_id == user.id)
+        query = select(Task).where(Task.owner_id == user.id)
         return super().get_all(db, filter_spec, sort_spec, offset, limit, user, query)
 
-    def get_by_opp(self, db: Session, opp_id: int, user: User) -> list[Task] | None:
+    def get_by_opp(
+        self,
+        opp_id: int,
+        db: Session,
+        filter_spec: list[dict],
+        sort_spec: list[dict],
+        offset: int,
+        limit: int,
+        user: User,
+    ):
         """Returns all the tasks based on the Opportunity ID"""
         db_session.set(db)
         opportunity = (
@@ -45,44 +53,13 @@ class CRUDTask(CRUDBase[Task, TaskCreate, TaskUpdate]):
         if not has_permission(user=user, resource=opportunity, permission=Permission.read):
             raise permission_exception
 
-        return (
-            db.execute(
-                select(Task)
-                .where(Task.parent_id == opp_id, Task.parent_type_id == "opportunity")
-                .order_by(Task.due_date)
-            )
-            .scalars()
-            .all()
-        )
-
-    def create(self, db: Session, obj_in: TaskCreate, user: User) -> Task:
-        """Creates a task"""
-        db_task = Task(**obj_in.dict(), created_by_id=user.id)
-
-        # Get class from parent_type_id
-        parent_model = get_class_by_tablename(obj_in.parent_type_id)
-
-        # Get the parent object
-        db_parent = (
-            db.execute(select(parent_model).where(parent_model.id == obj_in.parent_id))
-            .scalars()
-            .one_or_none()
-        )
-
-        if not db_parent:
-            raise HTTPException(status_code=404, detail="The parent object does not exist")
-
-        # Add the task to the parent object and return the task
-        db_parent.tasks.append(db_task)
-        db.add(db_parent)
-        db.commit()
-        db.refresh(db_task)
-        return db_task
+        query = select(Task).where(Task.opportunity_id == opp_id)
+        return super().get_all(db, filter_spec, sort_spec, offset, limit, user, query)
 
     def update(self, db: Session, db_obj: Task, obj_in: TaskUpdate, user: User) -> Task:
         """Updates a task"""
         if obj_in.status == TaskStatus.completed:
-            db_obj.completed_on = datetime.utcnow()
+            db_obj.completed_on = datetime.utcnow()  # type: ignore
         return super().update(db, db_obj, obj_in, user)
 
     def get_dashboard_data(self, db: Session, user: User):
@@ -91,11 +68,15 @@ class CRUDTask(CRUDBase[Task, TaskCreate, TaskUpdate]):
         open_tasks_df = tasks_df[tasks_df["status"] != TaskStatus.completed].copy()
         open_tasks_df["diff_due_date"] = (
             open_tasks_df["due_date"] - date.today()
-        ) / np.timedelta64(1, "D")
+        ) / np.timedelta64(  # type: ignore
+            1, "D"
+        )
         completed_tasks_df = tasks_df[tasks_df["status"] == TaskStatus.completed].copy()
         completed_tasks_df["diff_completed"] = (
             datetime.today() - completed_tasks_df["completed_on"]
-        ) / np.timedelta64(1, "D")
+        ) / np.timedelta64(  # type: ignore
+            1, "D"
+        )
 
         due_today = self._get_due_task_count(open_tasks_df, 0)
         due_in_7_days = self._get_due_task_count(open_tasks_df, 7)

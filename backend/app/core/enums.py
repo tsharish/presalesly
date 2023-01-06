@@ -27,11 +27,6 @@ class Permission(str, Enum):
     delete = "Delete"
 
 
-class TaskParentType(str, Enum):
-    opportunity = "opportunity"
-    answer = "answer"
-
-
 class MLAlgorithm(str, Enum):
     catboost = "catboost"
     lightgbm = "lightgbm"

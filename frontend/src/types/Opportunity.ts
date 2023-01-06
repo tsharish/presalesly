@@ -51,3 +51,8 @@ export interface OpportunityDetails {
     in_progress_task_count: number,
     completed_task_count: number
 }
+
+export interface OpportunitySummary {
+    id: number,
+    name: string
+}

@@ -4,10 +4,9 @@ from sqlalchemy.orm import relationship
 from app.db.base import Base
 from app.models.base import AppBase
 from app.models.user import UserTimeStampMixin, UserTimeStampBase, UserSummary
-from app.models.task import HasTasks
 
 # SQLAlchemy models
-class Answer(Base, HasTasks, UserTimeStampMixin):
+class Answer(Base, UserTimeStampMixin):
     id = Column(Integer, primary_key=True)
     language_code = Column(String, ForeignKey("shared.language.code"), default="EN")
     question = Column(String, nullable=False)
