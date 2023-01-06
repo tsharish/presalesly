@@ -27,14 +27,12 @@ async def get_task(id: int, db: Session = Depends(get_db), user: User = Depends(
 
 
 @router.get(
-    "/opportunity/{id}",
-    response_model=list[TaskRead],
+    "/opportunity/{opp_id}",
+    response_model=Page[TaskRead],
     summary="Get all tasks based on the opportunity ID",
 )
-async def get_tasks_by_opp(
-    id: int, db: Session = Depends(get_db), user: User = Depends(get_current_user)
-):
-    result = task.get_by_opp(db=db, opp_id=id, user=user)
+async def get_tasks_by_opp(opp_id: int, common: dict = Depends(common_parameters)):
+    result = task.get_by_opp(opp_id=opp_id, **common)
     if not result:
         raise HTTPException(status_code=404, detail="No tasks for this opportunity were found.")
     return result

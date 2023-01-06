@@ -8,9 +8,9 @@ import OpportunityHeader from '@/components/OpportunityHeaderCard.vue'
 
 const route = useRoute()
 const router = useRouter()
-const store = useOpportunityStore()
+const oppStore = useOpportunityStore()
 const toast = useToast()
-const { opportunity } = storeToRefs(store)
+const { opportunity } = storeToRefs(oppStore)
 
 const items = ref([
     { label: 'Tasks', icon: 'pi pi-check-square', to: 'tasks' },
@@ -19,7 +19,7 @@ const items = ref([
 
 onMounted(async () => {
     try {
-        await store.getOpportunityDetails(+route.params.id)     //'+' converts string to numbers in JS
+        await oppStore.getOpportunityDetails(+route.params.id)     //'+' converts string to numbers in JS
         router.push('tasks')    //This is needed to ensure that the Tasks tab is automatically loaded 
     } catch (error: any) {
         if (error.response.status === 404) {    // No records found
