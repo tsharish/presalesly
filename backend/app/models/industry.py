@@ -24,7 +24,7 @@ class Industry(Base, UserTimeStampMixin):
     is_active = Column(Boolean, default=True)
 
     @hybrid_property
-    def description(self):
+    def description(self):  # type: ignore
         """Sets the description from the descriptions table based on the language
         supplied in the route"""
         for item in self.descriptions:
@@ -42,9 +42,7 @@ class Industry(Base, UserTimeStampMixin):
             .scalar_subquery()
         )
 
-    descriptions = relationship(
-        "IndustryDescription", backref="industry", cascade="all, delete-orphan"
-    )
+    descriptions = relationship("IndustryDescription", cascade="all, delete-orphan")
 
     @classmethod
     def get_resource_type(cls):
@@ -74,8 +72,3 @@ class IndustryRead(UserTimeStampBase, IndustryBase):
 
 class IndustryUpdate(IndustryBase):
     descriptions: list[Description] | None = None
-
-
-class IndustrySummary(AppBase):
-    id: int
-    description: str | None = None

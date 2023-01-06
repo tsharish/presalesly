@@ -33,7 +33,7 @@ class OppStage(Base, UserTimeStampMixin):
     default_probability_percent = column_property(default_probability * 100)
 
     @hybrid_property
-    def description(self):
+    def description(self):  # type: ignore
         """Sets the description from the descriptions table
         based on the language supplied in the route"""
         for item in self.descriptions:
@@ -51,9 +51,7 @@ class OppStage(Base, UserTimeStampMixin):
             .scalar_subquery()
         )
 
-    descriptions = relationship(
-        "OppStageDescription", backref="opp_stage", cascade="all, delete-orphan"
-    )
+    descriptions = relationship("OppStageDescription", cascade="all, delete-orphan")
 
     @classmethod
     def get_resource_type(cls):
@@ -68,7 +66,7 @@ class Description(AppBase):
 
 class OppStageBase(AppBase):
     external_id: str | None = None
-    default_probability: confloat(ge=0, le=1)  # Must be between 0 and 1
+    default_probability: confloat(ge=0, le=1)  # type: ignore
     sort_order: int
     opp_status: OppStatus
     is_active: bool | None = True
@@ -86,12 +84,7 @@ class OppStageRead(UserTimeStampBase, OppStageBase):
 
 
 class OppStageUpdate(OppStageBase):
-    default_probability: confloat(ge=0, le=1) | None = None
+    default_probability: confloat(ge=0, le=1) | None = None  # type: ignore
     sort_order: int | None = None
     opp_status: OppStatus | None = None
     descriptions: list[Description] | None = None
-
-
-class OppStageSummary(AppBase):
-    id: int
-    description: str | None = None

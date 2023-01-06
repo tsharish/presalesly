@@ -13,7 +13,7 @@ class OppTemplate(Base, UserTimeStampMixin):
     id = Column(Integer, primary_key=True)
     description = Column(String)
     is_active = Column(Boolean, default=True)
-    opp_template_tasks = relationship("OppTemplateTask", backref="opp_template")
+    opp_template_tasks = relationship("OppTemplateTask")
 
     @classmethod
     def get_resource_type(cls):
