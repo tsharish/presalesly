@@ -6,7 +6,6 @@ from app.core.constants import COUNTRIES, CURRENCIES
 from app.db.base import Base
 from app.models.base import AppBase
 from app.models.user import UserTimeStampMixin, UserTimeStampBase
-from app.models.industry import IndustrySummary
 
 # SQLAlchemy models
 class Account(Base, UserTimeStampMixin):
@@ -35,6 +34,11 @@ class Account(Base, UserTimeStampMixin):
 
 
 # Pydantic models
+class IndustryRead(AppBase):
+    id: int
+    description: str | None = None
+
+
 class AccountBase(AppBase):
     external_id: str | None = None
     source_url: AnyUrl | None = None
@@ -74,15 +78,10 @@ class AccountCreate(AccountBase):
 
 class AccountRead(UserTimeStampBase, AccountBase):
     id: int
-    industry: IndustrySummary | None = None
+    industry: IndustryRead | None = None
 
 
 class AccountUpdate(AccountBase):
     name: str | None = None
     country_code: str | None = None
     industry_id: int | None = None
-
-
-class AccountSummary(AppBase):
-    id: int
-    name: str
