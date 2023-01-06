@@ -49,10 +49,16 @@ def get_resource_acl(resource: Any, permission: Permission) -> set[str]:
     )
 
     for entry in results:
-        if entry.role_id == "OWNER":
-            resource_acl.add(f"user:{resource.owner_id}")
-        elif entry.role_id == "PARENT":
-            resource_acl.add(f"user:{resource.parent.owner_id}")
-        else:
-            resource_acl.add(f"role:{entry.role_id}")
+        match entry.role_id:
+            case "OWNER":
+                resource_acl.add(f"user:{resource.owner_id}")
+            case "PARENT":
+                resource_acl.add(f"user:{resource.parent.owner_id}")
+            case "MEMBER":
+                # The members property of resource must return a list of user IDs
+                formatted_members = [f"user:{member}" for member in resource.members]
+                resource_acl.update(formatted_members)
+            case _:
+                resource_acl.add(f"role:{entry.role_id}")
+
     return resource_acl
