@@ -86,9 +86,8 @@ async function deleteTask(task: OppTemplateTask) {
 <template>
     <TaskNewEditDialog :taskNewEditDialog="taskNewEditDialog" :oppTemplateTask="oppTemplateTask"
         @click-cancel="cancelTaskNewEditDialog" @click-save="afterTaskSave"></TaskNewEditDialog>
-    <p class="mt-3" v-if="message">No tasks found</p>
-    <Button label="Add a task" icon="pi pi-plus" class="p-button-sm p-button-success p-button-text"
-        @click="openTaskNewEditDialog" />
+    <Button label="New" icon="pi pi-plus" class="p-button-sm mb-2" @click="openTaskNewEditDialog" />
+    <p class="mt-2" v-if="message">No tasks found</p>
     <TaskItem v-for="task in oppTemplateTasks" :task="task" :key="task.id" @click-edit="editTask"
         @click-delete="deleteTask" />
 </template>
