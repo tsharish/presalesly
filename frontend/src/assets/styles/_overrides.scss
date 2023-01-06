@@ -4,22 +4,17 @@
 }
 
 .layout-sidebar {
-	width: 250px;
-	top: 5rem;
+    width: 250px;
+    top: 5rem;
 }
 
 .layout-topbar {
     height: 4rem;
 }
 
-td {
-    .p-button-rounded.p-button-text {
-        width: 2.5rem;
-    }
-    
-    .p-button.p-button-icon-only.p-button-rounded {
-        height: 2.5rem;
-    }
+.p-button.p-button-icon-only.p-button-rounded {
+    width: 2.5rem;
+    height: 2.5rem;
 }
 
 .p-card {
